@@ -24,14 +24,15 @@
     "sync:bimr": "node scripts/sync-bimr.mjs"
   },
   "dependencies": {
-    "@hackeindhoven/module-contracts": "0.1.0",
     "@ai-sdk/openai": "^2.0.125",
     "@ai-sdk/react": "^2.0.256",
     "@bimr/web": "^0.0.2",
     "@codemirror/lang-html": "^6.4.12",
+    "@hackeindhoven/module-contracts": "0.1.0",
     "@isomorphic-git/lightning-fs": "^4.7.0",
     "@tablette/module-canutes": "^0.1.0",
     "@tablette/module-eindhoven": "0.1.0",
+    "@tablette/module-fellenoord-samen": "0.1.0",
     "@tablette/module-opendata": "^0.1.0",
     "@tablette/module-report": "^0.1.0",
     "@tablette/module-sdk": "^0.1.0",

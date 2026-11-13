@@ -7,6 +7,7 @@
 import type { StudioModule } from "@tablette/module-sdk";
 import { canutesModule } from "@tablette/module-canutes";
 import { eindhovenModule } from "@tablette/module-eindhoven";
+import { moduleDescriptor } from "@tablette/module-fellenoord-samen";
 import { opendataModule } from "@tablette/module-opendata";
 import { reportModule } from "@tablette/module-report";
 import { wikidataModule } from "@tablette/module-wikidata";
@@ -16,6 +17,7 @@ import { wikimediaModule } from "@tablette/module-wikimedia";
 export const GENERATED_MODULES: StudioModule[] = [
   canutesModule,
   eindhovenModule,
+  moduleDescriptor,
   opendataModule,
   reportModule,
   wikidataModule,
