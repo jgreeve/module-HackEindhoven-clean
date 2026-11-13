@@ -9,6 +9,19 @@
 - Current map: official district/neighbourhood boundaries, OSM raster basemap,
   live permits with date/category/status filtering and a visible 5,000-row cap.
 
+## Fellenoord Samen integration
+
+- Independent `module-fellenoord-samen` workspace, public SDK descriptor,
+  Dutch React Surface, shared project/idea map, local discussions/support and
+  namespaced discovery/detail tools. Module scope/provenance is in its README.
+- Remaining product work before real participation: approve an authoritative
+  digital Fellenoord perimeter and licensed official project media/data; decide
+  authentication, shared storage, moderation and municipal handoff requirements.
+- This is a local demonstration with fictional scenarios and a labelled
+  approximate boundary; it is not an official consultation or shared platform.
+- Other agents migrate only completed module-specific work through reviewed PRs
+  following `docs/MODULE_MIGRATION.md`.
+
 ## Paused: OSM buildings and green spaces
 
 Tracked in [GitHub issue #1](https://github.com/jgreeve/module-HackEindhoven/issues/1).

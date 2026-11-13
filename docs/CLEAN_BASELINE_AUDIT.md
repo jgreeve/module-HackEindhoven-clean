@@ -45,7 +45,7 @@ OSM downloader is explicitly WIP and is not executed by setup, build or tests.
   Resolve in a dedicated compatibility-reviewed dependency PR; do not run a
   forced audit fix or silently fork the SDK. This baseline is not a security
   certification. Bound module input sizes before parsing untrusted collections.
-- `sync:bimr` probes the original author's external viewer checkout. It warns
+- `sync:bimr` probes an optional external viewer source checkout. It warns
   when absent and keeps the committed viewer. Reproducible install/build and
   browser tests succeed without that checkout.
 - Require PR review and successful CI for integration; repository protection

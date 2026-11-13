@@ -1,0 +1,28 @@
+{
+  "name": "@tablette/module-fellenoord-samen",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "studioModule": { "id": "fellenoord-samen", "entry": "./dist/index.js", "export": "moduleDescriptor" },
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "watch": "vite build --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/module.test.ts"
+  },
+  "peerDependencies": {
+    "@tablette/module-sdk": "^0.1.0",
+    "ai": "^5.0.253",
+    "react": "^19.2.0",
+    "zod": "^3.25.0"
+  },
+  "dependencies": {
+    "leaflet": "1.9.4"
+  },
+  "devDependencies": {
+    "@tablette/module-sdk": "^0.1.0",
+    "@types/leaflet": "^1.9.21"
+  }
+}

@@ -8,8 +8,8 @@ with independently developed modules for people and coding agents.
 Use Node.js **22.12+ (22 LTS)** and npm. From the repository root:
 
 ```sh
-git clone https://github.com/jgreeve/module-HackEindhoven.git
-cd module-HackEindhoven
+git clone https://github.com/jgreeve/module-HackEindhoven-clean.git
+cd module-HackEindhoven-clean
 npm ci
 npm run dev
 ```
@@ -18,8 +18,13 @@ Open the URL printed by Vite, normally `http://localhost:5173`. Run commands fro
 this repository, not the earlier standalone `tablette` checkout.
 
 **Explore → Modules → Eindhoven → Open** displays the first local module.
-**Open in Sketch** moves its map to the editor/viewer. **Samples** also lists
-module-provided maps. A model API key is only needed for chat; configure it in
+Its **Open in Sketch** action moves the Eindhoven map to the editor/viewer.
+**Samples** also lists module-provided maps.
+
+**Explore → Modules → Fellenoord Samen → Open** opens the local participation
+map: demo projects, community ideas, discussion threads and reversible support.
+Contributions are stored only in this browser; there is no municipal submission.
+A model API key is only needed for chat; configure it in
 the browser's Settings. Public map data does not require a model key.
 
 ## Repository layout
@@ -27,6 +32,7 @@ the browser's Settings. Public map data does not require a model key.
 ```text
 apps/tablette/                  Shared app shell and upstream features
 packages/module-eindhoven/      Eindhoven UI, tools and map document
+packages/module-fellenoord-samen/ Fellenoord participation Surface, data and tools
 packages/module-contracts/      Small shared extension to the upstream module SDK
 templates/module/              Runnable starting point for new modules
 scripts/                       Build, scaffold and architecture checks
@@ -79,6 +85,9 @@ to shared contracts, app dependencies and the root lockfile.
 - [Module authoring](docs/module-development.md)
 - [Current status and paused OSM work](docs/backlog.md)
 - [Upstream provenance](UPSTREAM.md)
+- [Clean baseline audit and source commit](docs/CLEAN_BASELINE_AUDIT.md)
+- [Migration for completed agent modules](docs/MODULE_MIGRATION.md)
+- [Fellenoord Samen scope, provenance and storage](packages/module-fellenoord-samen/README.md)
 
 Code is MIT-licensed; original Tablette copyright and license notices are
 preserved. Municipal source data and OSM data retain their respective licenses.
