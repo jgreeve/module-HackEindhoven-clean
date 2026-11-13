@@ -1,0 +1,23 @@
+{
+  "name": "@tablette/module-eindhoven",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Official Eindhoven open-data map and workspace tools",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "studioModule": { "id": "eindhoven", "entry": "./dist/index.js", "export": "eindhovenModule" },
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "watch": "vite build --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/eindhoven.test.ts"
+  },
+  "peerDependencies": {
+    "@hackeindhoven/module-contracts": "0.1.0",
+    "@tablette/module-sdk": "^0.1.0",
+    "ai": "^5.0.253",
+    "react": "^19.2.0",
+    "zod": "^3.25.0"
+  }
+}

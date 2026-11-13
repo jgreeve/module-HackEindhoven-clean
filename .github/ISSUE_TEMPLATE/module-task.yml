@@ -1,0 +1,30 @@
+name: Module task
+description: Claim a bounded module, page or internal tab for a person or agent
+title: '[module-id] '
+body:
+  - type: input
+    id: module
+    attributes:
+      label: Module/package
+      placeholder: packages/module-eindhoven
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and owner
+      description: State the owner/agent, branch, pages/tabs and files expected to change.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What must work, and how will it be verified?
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and shared changes
+      description: Link related issues, public data sources, and any required host/contract changes.

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://artefacts.bimr.net/schemas/bimr.schema.json",
+  "title": "BIMR library catalogue",
+  "description": "The BIMR library catalogue (bimr.yaml): reusable components, sketches, models and tutorials. Repo-local or aggregated in the studio-gateway.",
+  "type": "object",
+  "required": ["bimr", "items"],
+  "properties": {
+    "bimr": {
+      "const": 1,
+      "description": "Schema version."
+    },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/item" }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "item": {
+      "type": "object",
+      "required": ["id", "kind", "title"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "description": "Stable slug."
+        },
+        "kind": {
+          "enum": ["component", "sketch", "model", "tutorial"],
+          "description": "Maps to the forge theme taxonomy."
+        },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "repo": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$",
+          "description": "owner/name; optional when the item is local to the repo."
+        },
+        "path": { "type": "string" },
+        "preview": { "type": "string", "description": "Thumbnail path or URL." },
+        "ref": { "type": "string" },
+        "version": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "params": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "enum": ["int", "float", "bool", "string", "point", "list"] },
+              "default": {},
+              "description": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

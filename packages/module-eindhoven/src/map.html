@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Eindhoven open data</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        --ink: #17212b;
+        --muted: #5b6b7c;
+        --line: #d9e2ec;
+        --accent: #0f766e;
+        --accent-soft: #ccfbf1;
+        --danger: #b42318;
+      }
+      html,
+      body,
+      #map {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        background: #e8eef3;
+        color: var(--ink);
+      }
+      #panel {
+        position: absolute;
+        z-index: 1000;
+        top: 12px;
+        left: 12px;
+        width: 360px;
+        max-width: calc(100vw - 24px);
+        max-height: calc(100vh - 24px);
+        overflow: auto;
+        border: 1px solid rgba(23, 33, 43, 0.12);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 10px 30px rgba(23, 33, 43, 0.18);
+        padding: 16px;
+        box-sizing: border-box;
+      }
+      .head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 1.1rem;
+        line-height: 1.25;
+      }
+      .sub {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 0.78rem;
+        line-height: 1.4;
+      }
+      .live {
+        flex: none;
+        border-radius: 999px;
+        background: #dcfce7;
+        color: #166534;
+        padding: 4px 8px;
+        font-size: 0.64rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+      }
+      .status {
+        margin: 14px 0 10px;
+        border-left: 3px solid var(--line);
+        padding: 4px 0 4px 9px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        line-height: 1.4;
+      }
+      .status.loading {
+        border-color: #f59e0b;
+        color: #92400e;
+      }
+      .status.ok {
+        border-color: #10b981;
+        color: #065f46;
+      }
+      .status.error {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      form {
+        display: grid;
+        gap: 9px;
+      }
+      .dates {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      label {
+        display: grid;
+        gap: 4px;
+        color: #34495e;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      input,
+      select {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: #fff;
+        color: var(--ink);
+        padding: 7px 8px;
+        font: inherit;
+        font-size: 0.78rem;
+      }
+      input:focus,
+      select:focus {
+        outline: 2px solid #99f6e4;
+        outline-offset: 1px;
+        border-color: var(--accent);
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 2px;
+      }
+      button {
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: #fff;
+        color: #334155;
+        padding: 7px 11px;
+        font: inherit;
+        font-size: 0.77rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #f8fafc;
+      }
+      button.primary {
+        flex: 1;
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #fff;
+      }
+      button.primary:hover {
+        background: #115e59;
+      }
+      button:disabled {
+        cursor: wait;
+        opacity: 0.6;
+      }
+      .meta {
+        margin-top: 11px;
+        color: #334155;
+        font-size: 0.73rem;
+        line-height: 1.45;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px 10px;
+        margin-top: 7px;
+        color: #475569;
+        font-size: 0.69rem;
+      }
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9);
+      }
+      .sources {
+        margin-top: 12px;
+        border-top: 1px solid var(--line);
+        padding-top: 9px;
+        color: var(--muted);
+        font-size: 0.68rem;
+        line-height: 1.5;
+      }
+      .sources a {
+        color: #0f766e;
+      }
+      .popup {
+        min-width: 210px;
+        max-width: 280px;
+        color: #1e293b;
+        font: 12px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      .popup-title {
+        margin: 0 0 7px;
+        font-size: 13px;
+        line-height: 1.35;
+      }
+      .pill {
+        display: inline-block;
+        margin-bottom: 8px;
+        border-radius: 999px;
+        padding: 2px 7px;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .popup-grid {
+        display: grid;
+        grid-template-columns: 74px 1fr;
+        gap: 4px 8px;
+      }
+      .popup-grid dt {
+        color: #64748b;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .popup-grid dd {
+        margin: 0;
+      }
+      .leaflet-popup-content {
+        margin: 12px 14px;
+      }
+      .leaflet-control-layers {
+        border-radius: 10px;
+        box-shadow: 0 4px 14px rgba(23, 33, 43, 0.15);
+      }
+      .leaflet-control-attribution {
+        font-size: 10px;
+      }
+      @media (max-width: 620px) {
+        #panel {
+          top: 8px;
+          left: 8px;
+          max-height: 46vh;
+          width: calc(100vw - 16px);
+          padding: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" role="application" aria-label="Eindhoven open data map"></div>
+
+    <aside id="panel">
+      <div class="head">
+        <div>
+          <h1>Eindhoven open data</h1>
+          <p class="sub">Districts, neighbourhoods and live permit applications from Gemeente Eindhoven.</p>
+        </div>
+        <span class="live">LIVE</span>
+      </div>
+
+      <div id="status" class="status">Loading map layers…</div>
+
+      <form id="filters">
+        <div class="dates">
+          <label>
+            From
+            <input id="from" type="date" required />
+          </label>
+          <label>
+            To
+            <input id="to" type="date" required />
+          </label>
+        </div>
+        <label>
+          Category
+          <select id="product">
+            <option value="">All categories</option>
+          </select>
+        </label>
+        <label>
+          Status
+          <select id="status-filter">
+            <option value="">All statuses</option>
+          </select>
+        </label>
+        <div class="actions">
+          <button id="apply" class="primary" type="button">Apply filters</button>
+          <button id="reset" type="button">Reset</button>
+        </div>
+      </form>
+
+      <div id="meta" class="meta"></div>
+      <div id="legend" class="legend"></div>
+
+      <div class="sources">
+        Source: <a href="https://data.eindhoven.nl/explore/dataset/wijken/" target="_blank" rel="noreferrer">Wijkgrens</a>,
+        <a href="https://data.eindhoven.nl/explore/dataset/buurten/" target="_blank" rel="noreferrer">Buurtgrens</a>,
+        <a href="https://data.eindhoven.nl/explore/dataset/aangevraagde-vergunningen/" target="_blank" rel="noreferrer">Aangevraagde vergunningen</a>
+        — Gemeente Eindhoven, public domain. Map: © OpenStreetMap contributors (ODbL).
+      </div>
+    </aside>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        var API = "https://data.eindhoven.nl/api/explore/v2.1/catalog/datasets";
+        var PERMIT_DATASET = "aangevraagde-vergunningen";
+        var MAX_PERMITS = 5000;
+        var DEFAULT_DAYS = 90;
+        var SELECT = [
+          "zaaknummer",
+          "omschrijving",
+          "zaakproduct_oms",
+          "status_oms",
+          "adres",
+          "ddindiening",
+          "ddbeschikking",
+          "geo_point_2d",
+        ].join(",");
+
+        var STATUS_COLORS = {
+          "Zaak gestart": "#f59e0b",
+          "Intake afgerond": "#3b82f6",
+          "Getoetst aan regelgeving": "#8b5cf6",
+          "Wachten op aanvullende stukken": "#f97316",
+          "Ontwerpbeschikking ter inzage gelegd": "#06b6d4",
+          "Beschikking vastgesteld": "#0ea5e9",
+          "Zaak afgerond": "#10b981",
+        };
+
+        var KNOWN_PRODUCTS = [
+          "Omgevingsvergunning (OLO)",
+          "OV Gecombineerd",
+          "Gebruik openbare ruimte",
+          "OV Ruimtelijk",
+          "Alcoholwet",
+          "OV Bouwtechnisch",
+          "APV Exploitatievergunning",
+          "APV",
+          "OV Milieu",
+        ];
+
+        var KNOWN_STATUSES = [
+          "Zaak afgerond",
+          "Beschikking vastgesteld",
+          "Getoetst aan regelgeving",
+          "Zaak gestart",
+          "Intake afgerond",
+          "Wachten op aanvullende stukken",
+          "Ontwerpbeschikking ter inzage gelegd",
+        ];
+
+        var els = {
+          from: document.getElementById("from"),
+          to: document.getElementById("to"),
+          product: document.getElementById("product"),
+          statusFilter: document.getElementById("status-filter"),
+          apply: document.getElementById("apply"),
+          reset: document.getElementById("reset"),
+          status: document.getElementById("status"),
+          meta: document.getElementById("meta"),
+          legend: document.getElementById("legend"),
+        };
+
+        var map = L.map("map", {
+          zoomControl: false,
+          preferCanvas: true,
+          minZoom: 10,
+        }).setView([51.4416, 5.4697], 12);
+
+        L.control.zoom({ position: "bottomright" }).addTo(map);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors (ODbL)',
+        }).addTo(map);
+
+        var wijkLayer = L.geoJSON(null, {
+          style: function () {
+            return {
+              color: "#0f766e",
+              weight: 2,
+              opacity: 0.9,
+              fillColor: "#14b8a6",
+              fillOpacity: 0.04,
+            };
+          },
+          onEachFeature: function (feature, layer) {
+            var p = feature.properties || {};
+            var name = p.wijknaam || "Wijk";
+            layer.bindTooltip(escapeHtml(name), { sticky: true });
+            layer.bindPopup(
+              '<div class="popup"><h3 class="popup-title">' +
+                escapeHtml(name) +
+                "</h3><dl class=\"popup-grid\"><dt>Wijkcode</dt><dd>" +
+                escapeHtml(p.wijkcode) +
+                "</dd><dt>Stadsdeel</dt><dd>" +
+                escapeHtml(p.stadsdeelnaam) +
+                "</dd></dl></div>",
+            );
+            layer.on("mouseover", function () {
+              layer.setStyle({ weight: 3, fillOpacity: 0.12 });
+            });
+            layer.on("mouseout", function () {
+              wijkLayer.resetStyle(layer);
+            });
+          },
+        }).addTo(map);
+
+        var buurtLayer = L.geoJSON(null, {
+          style: function () {
+            return {
+              color: "#2563eb",
+              weight: 1.2,
+              opacity: 0.75,
+              dashArray: "4 3",
+              fill: false,
+            };
+          },
+          onEachFeature: function (feature, layer) {
+            var p = feature.properties || {};
+            var name = p.buurtnaam || "Buurt";
+            layer.bindTooltip(escapeHtml(name), { sticky: true });
+            layer.bindPopup(
+              '<div class="popup"><h3 class="popup-title">' +
+                escapeHtml(name) +
+                "</h3><dl class=\"popup-grid\"><dt>Buurtcode</dt><dd>" +
+                escapeHtml(p.buurtcode) +
+                "</dd><dt>Wijk</dt><dd>" +
+                escapeHtml(p.wijknaam) +
+                "</dd><dt>Stadsdeel</dt><dd>" +
+                escapeHtml(p.stadsdeelnaam) +
+                "</dd></dl></div>",
+            );
+            layer.on("mouseover", function () {
+              layer.setStyle({ weight: 2.5, opacity: 1 });
+            });
+            layer.on("mouseout", function () {
+              buurtLayer.resetStyle(layer);
+            });
+          },
+        }).addTo(map);
+
+        var permitRenderer = L.canvas({ padding: 0.4 });
+        var permitLayer = L.layerGroup().addTo(map);
+        var permitAbort = null;
+
+        L.control
+          .layers(
+            null,
+            {
+              "Districts (wijken)": wijkLayer,
+              "Neighbourhoods (buurten)": buurtLayer,
+              "Permit applications": permitLayer,
+            },
+            { position: "topright", collapsed: window.innerWidth < 900 },
+          )
+          .addTo(map);
+
+        function escapeHtml(value) {
+          return String(value == null ? "" : value).replace(
+            /[&<>"']/g,
+            function (ch) {
+              return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+              }[ch];
+            },
+          );
+        }
+
+        function isoDate(date) {
+          return (
+            date.getFullYear() +
+            "-" +
+            String(date.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(date.getDate()).padStart(2, "0")
+          );
+        }
+
+        function formatDate(value) {
+          if (!value) return "—";
+          var raw = String(value);
+          var date = new Date(
+            raw.length === 10 ? raw + "T12:00:00" : raw,
+          );
+          if (Number.isNaN(date.getTime())) return raw;
+          return date.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          });
+        }
+
+        function formatDateTime(date) {
+          return date.toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        }
+
+        function setStatus(text, kind) {
+          els.status.textContent = text;
+          els.status.className = "status" + (kind ? " " + kind : "");
+        }
+
+        function fetchJson(url, signal) {
+          return fetch(url, { signal: signal }).then(function (response) {
+            if (!response.ok) {
+              throw new Error("HTTP " + response.status + " for " + url);
+            }
+            return response.json();
+          });
+        }
+
+        function odsLiteral(value) {
+          return "'" + String(value).replace(/'/g, "''") + "'";
+        }
+
+        function readFilters() {
+          var from = els.from.value;
+          var to = els.to.value;
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
+            throw new Error("Choose a valid start and end date.");
+          }
+          if (from > to) {
+            throw new Error("The start date must be before the end date.");
+          }
+          var clauses = [
+            "ddindiening >= date" + odsLiteral(from),
+            "ddindiening <= date" + odsLiteral(to),
+          ];
+          if (els.product.value) {
+            clauses.push("zaakproduct_oms = " + odsLiteral(els.product.value));
+          }
+          if (els.statusFilter.value) {
+            clauses.push("status_oms = " + odsLiteral(els.statusFilter.value));
+          }
+          return { from: from, to: to, where: clauses.join(" and ") };
+        }
+
+        function addOptions(select, values) {
+          var current = select.value;
+          while (select.options.length > 1) select.remove(1);
+          var seen = new Set();
+          for (var i = 0; i < values.length; i++) {
+            var value = values[i];
+            if (!value || seen.has(value)) continue;
+            seen.add(value);
+            var option = document.createElement("option");
+            option.value = value;
+            option.textContent = value;
+            select.appendChild(option);
+          }
+          if (seen.has(current)) select.value = current;
+        }
+
+        async function loadFacets() {
+          try {
+            var productParams = new URLSearchParams({
+              select: "zaakproduct_oms,count(*) as n",
+              group_by: "zaakproduct_oms",
+              order_by: "n DESC",
+              limit: "100",
+            });
+            var statusParams = new URLSearchParams({
+              select: "status_oms,count(*) as n",
+              group_by: "status_oms",
+              order_by: "n DESC",
+              limit: "100",
+            });
+            var responses = await Promise.all([
+              fetchJson(API + "/" + PERMIT_DATASET + "/records?" + productParams),
+              fetchJson(API + "/" + PERMIT_DATASET + "/records?" + statusParams),
+            ]);
+            addOptions(
+              els.product,
+              responses[0].results
+                .map(function (row) { return row.zaakproduct_oms; })
+                .filter(Boolean),
+            );
+            addOptions(
+              els.statusFilter,
+              responses[1].results
+                .map(function (row) { return row.status_oms; })
+                .filter(Boolean),
+            );
+          } catch (error) {
+            console.warn("[eindhoven] facets unavailable", error);
+          }
+        }
+
+        function addBoundary(dataset, layer) {
+          return fetchJson(API + "/" + dataset + "/exports/geojson").then(
+            function (geojson) {
+              layer.addData(geojson);
+              return layer.getBounds();
+            },
+          );
+        }
+
+        async function loadBoundaries() {
+          var results = await Promise.allSettled([
+            addBoundary("wijken", wijkLayer),
+            addBoundary("buurten", buurtLayer),
+          ]);
+          var bounds = L.latLngBounds([]);
+          results.forEach(function (result) {
+            if (result.status === "fulfilled" && result.value.isValid()) {
+              bounds.extend(result.value);
+            } else if (result.status === "rejected") {
+              console.warn("[eindhoven] boundary unavailable", result.reason);
+            }
+          });
+          if (bounds.isValid()) {
+            var left = window.innerWidth > 620 ? 380 : 20;
+            map.fitBounds(bounds, {
+              paddingTopLeft: [left, 20],
+              paddingBottomRight: [20, 20],
+            });
+          }
+          return bounds.isValid();
+        }
+
+        function colorForStatus(status) {
+          return STATUS_COLORS[status] || "#64748b";
+        }
+
+        function permitPopup(row) {
+          var status = row.status_oms || "Unknown";
+          var color = colorForStatus(row.status_oms);
+          return (
+            '<div class="popup"><h3 class="popup-title">' +
+            escapeHtml(row.omschrijving || "Permit application") +
+            '</h3><span class="pill" style="background:' +
+            color +
+            '">' +
+            escapeHtml(status) +
+            '</span><dl class="popup-grid"><dt>Case</dt><dd>' +
+            escapeHtml(row.zaaknummer) +
+            "</dd><dt>Address</dt><dd>" +
+            escapeHtml(row.adres || "—") +
+            "</dd><dt>Category</dt><dd>" +
+            escapeHtml(row.zaakproduct_oms || "—") +
+            "</dd><dt>Applied</dt><dd>" +
+            escapeHtml(formatDate(row.ddindiening)) +
+            "</dd><dt>Decision</dt><dd>" +
+            escapeHtml(formatDate(row.ddbeschikking)) +
+            "</dd></dl></div>"
+          );
+        }
+
+        function renderPermits(rows, total, filters) {
+          permitLayer.clearLayers();
+          var counts = new Map();
+          var visible = 0;
+
+          for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            var point = row.geo_point_2d;
+            if (!point || typeof point.lat !== "number" || typeof point.lon !== "number") {
+              continue;
+            }
+            visible++;
+            var status = row.status_oms || "Unknown";
+            counts.set(status, (counts.get(status) || 0) + 1);
+            var marker = L.circleMarker([point.lat, point.lon], {
+              renderer: permitRenderer,
+              radius: rows.length > 2500 ? 3.2 : 4.5,
+              color: "#ffffff",
+              weight: 1,
+              fillColor: colorForStatus(row.status_oms),
+              fillOpacity: 0.9,
+            });
+            marker.bindPopup(function () {
+              return permitPopup(row);
+            });
+            permitLayer.addLayer(marker);
+          }
+
+          var shown = total > visible && visible === MAX_PERMITS;
+          var countText =
+            visible.toLocaleString("en-GB") +
+            (total > visible ? " of " + total.toLocaleString("en-GB") : "") +
+            " permit application" +
+            (total === 1 ? "" : "s");
+          els.meta.textContent =
+            countText +
+            " · applied " +
+            formatDate(filters.from) +
+            " – " +
+            formatDate(filters.to) +
+            " · updated " +
+            formatDateTime(new Date());
+
+          if (!visible) {
+            setStatus("No permit applications in this selection. Try a wider date range.", "ok");
+          } else if (shown) {
+            setStatus(
+              "Showing the latest " +
+                MAX_PERMITS.toLocaleString("en-GB") +
+                " applications. Narrow the dates or category to see the rest.",
+              "ok",
+            );
+          } else {
+            setStatus("Loaded " + countText + " from the live Eindhoven API.", "ok");
+          }
+
+          var ordered = Array.from(counts.entries()).sort(function (a, b) {
+            return b[1] - a[1];
+          });
+          els.legend.innerHTML = ordered
+            .map(function (entry) {
+              return (
+                '<span><i class="dot" style="background:' +
+                colorForStatus(entry[0]) +
+                '"></i>' +
+                escapeHtml(entry[0]) +
+                " (" +
+                entry[1].toLocaleString("en-GB") +
+                ")</span>"
+              );
+            })
+            .join("");
+        }
+
+        async function loadPermits() {
+          if (permitAbort) permitAbort.abort();
+          var controller = new AbortController();
+          permitAbort = controller;
+
+          var filters;
+          try {
+            filters = readFilters();
+          } catch (error) {
+            setStatus(error.message, "error");
+            return;
+          }
+
+          els.apply.disabled = true;
+          setStatus("Loading live permit applications…", "loading");
+
+          var countParams = new URLSearchParams({
+            select: "count(*) as n",
+            where: filters.where,
+            limit: "1",
+          });
+          var dataParams = new URLSearchParams({
+            select: SELECT,
+            where: filters.where,
+            order_by: "ddindiening DESC",
+            limit: String(MAX_PERMITS),
+          });
+
+          try {
+            var responses = await Promise.all([
+              fetchJson(
+                API + "/" + PERMIT_DATASET + "/records?" + countParams,
+                controller.signal,
+              ),
+              fetchJson(
+                API + "/" + PERMIT_DATASET + "/exports/json?" + dataParams,
+                controller.signal,
+              ),
+            ]);
+            var countResult = responses[0].results && responses[0].results[0];
+            var total = countResult && typeof countResult.n === "number"
+              ? countResult.n
+              : responses[1].length;
+            renderPermits(responses[1], total, filters);
+          } catch (error) {
+            if (error && error.name === "AbortError") return;
+            console.error("[eindhoven] permits", error);
+            setStatus(
+              "Could not load permit applications. Check the network connection and try again.",
+              "error",
+            );
+          } finally {
+            if (permitAbort === controller) {
+              permitAbort = null;
+              els.apply.disabled = false;
+            }
+          }
+        }
+
+        function resetDates() {
+          var today = new Date();
+          var start = new Date(today);
+          start.setDate(start.getDate() - DEFAULT_DAYS);
+          els.from.value = isoDate(start);
+          els.to.value = isoDate(today);
+        }
+
+        els.product.innerHTML =
+          '<option value="">All categories</option>' +
+          KNOWN_PRODUCTS.map(function (value) {
+            return '<option value="' + escapeHtml(value) + '">' + escapeHtml(value) + "</option>";
+          }).join("");
+        els.statusFilter.innerHTML =
+          '<option value="">All statuses</option>' +
+          KNOWN_STATUSES.map(function (value) {
+            return '<option value="' + escapeHtml(value) + '">' + escapeHtml(value) + "</option>";
+          }).join("");
+
+        els.reset.addEventListener("click", function () {
+          resetDates();
+          els.product.value = "";
+          els.statusFilter.value = "";
+          loadPermits();
+        });
+
+        els.apply.addEventListener("click", loadPermits);
+
+        document.getElementById("filters").addEventListener("keydown", function (event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            loadPermits();
+          }
+        });
+
+        resetDates();
+        loadBoundaries();
+        loadFacets();
+        loadPermits();
+      })();
+    </script>
+  </body>
+</html>

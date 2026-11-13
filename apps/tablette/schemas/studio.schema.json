@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://artefacts.bimr.net/schemas/studio.schema.json",
+  "title": "Studio repository descriptor",
+  "description": "Declarative UX for a forge repo, read by Studio's explore mode (.studio/studio.yaml). Data only; widget types map to a fixed registry.",
+  "type": "object",
+  "required": ["studio"],
+  "properties": {
+    "studio": {
+      "const": 1,
+      "description": "Schema version."
+    },
+    "repo": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$",
+      "description": "owner/name; defaults to the repo the descriptor lives in."
+    },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "icon": { "type": "string", "description": "Named icon id or image URL." },
+    "theme": { "type": "string" },
+    "entry": { "type": "string", "description": "Landing page: a markdown file path or a wiki page name." },
+    "featured": { "type": "boolean" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "nav": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/navItem" }
+    },
+    "components": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/widget" }
+    },
+    "actions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/action" }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "navItem": {
+      "type": "object",
+      "required": ["label"],
+      "properties": {
+        "label": { "type": "string" },
+        "page": { "type": "string" },
+        "wiki": { "type": "string" },
+        "gallery": { "type": "string" },
+        "models": { "type": "string" },
+        "component": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "widget": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": [
+            "readme",
+            "wiki",
+            "docs",
+            "gallery",
+            "models",
+            "builds",
+            "releases",
+            "issues",
+            "markdown",
+            "links",
+            "embed"
+          ],
+          "description": "Widget from the fixed registry. Unknown types are ignored."
+        },
+        "title": { "type": "string" },
+        "source": { "type": "string", "description": "e.g. wiki, or a bimr.yaml path." },
+        "root": { "type": "string", "description": "docs tree root." },
+        "paths": { "type": "array", "items": { "type": "string" } },
+        "workflow": { "type": "string" },
+        "page": { "type": "string" },
+        "url": { "type": "string", "description": "For embed (opt-in, sandboxed)." },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["label", "href"],
+            "properties": {
+              "label": { "type": "string" },
+              "href": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "action": {
+      "type": "object",
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "handoff": { "$ref": "#/$defs/handoff" }
+      },
+      "additionalProperties": true
+    },
+    "handoff": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "open-file",
+            "insert-component",
+            "load-lesson",
+            "build",
+            "preview-artefact"
+          ]
+        },
+        "path": { "type": "string" },
+        "run": { "type": "boolean" },
+        "repo": { "type": "string" },
+        "ref": { "type": "string" },
+        "name": { "type": "string" },
+        "source": { "type": "string" },
+        "track": { "type": "string" },
+        "lesson": { "type": "string" },
+        "url": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  }
+}

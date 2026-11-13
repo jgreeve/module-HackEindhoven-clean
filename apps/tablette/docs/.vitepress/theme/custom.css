@@ -1,0 +1,74 @@
+/* SPDX-FileCopyrightText: 2026 Milovann Yanatchkov */
+/* SPDX-License-Identifier: MIT */
+
+/* Match the Studio light theme: white surfaces, warm borders, blue accent. */
+:root {
+  --vp-c-brand-1: #2563eb;
+  --vp-c-brand-2: #1d4ed8;
+  --vp-c-brand-3: #1e40af;
+  --vp-c-brand-soft: #eff4ff;
+
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-soft: #f7f6f4;
+  --vp-c-bg-alt: #f7f6f4;
+  --vp-c-divider: #e5e0dc;
+  --vp-c-border: #e5e0dc;
+  --vp-c-gutter: #e5e0dc;
+
+  --vp-button-brand-bg: #2563eb;
+  --vp-button-brand-hover-bg: #1d4ed8;
+  --vp-button-brand-active-bg: #1e40af;
+
+  --vp-home-hero-name-color: #1f2328;
+  --vp-home-hero-name-background: none;
+  --vp-home-hero-image-background-image: none;
+  --vp-home-hero-image-filter: none;
+}
+
+.dark {
+  --vp-c-brand-1: #7aa2ff;
+  --vp-c-brand-2: #93b4ff;
+  --vp-c-brand-3: #b3caff;
+  --vp-c-brand-soft: #16213e;
+}
+
+.VPHero .image-bg {
+  display: none;
+}
+
+.VPHero .image-container {
+  max-width: 420px;
+}
+
+.VPHero .image-src {
+  max-width: 420px;
+  max-height: none;
+}
+
+@media (max-width: 640px) {
+  .VPHero .image-container,
+  .VPHero .image-src {
+    max-width: 280px;
+  }
+}
+
+/* Keep tables readable in the reference pages. */
+.vp-doc table {
+  display: table;
+  width: 100%;
+}
+
+.vp-doc th,
+.vp-doc td {
+  font-size: 0.92rem;
+}
+
+/* Slightly denser module tool lists. */
+.vp-doc code {
+  white-space: nowrap;
+}
+
+.vp-doc p code,
+.vp-doc li code {
+  white-space: normal;
+}

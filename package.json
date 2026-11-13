@@ -1,0 +1,38 @@
+{
+  "name": "hackeindhoven",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Hackathon Eindhoven Community Building Challenge — Tablette host and independent modules",
+  "repository": "github:jgreeve/module-HackEindhoven",
+  "engines": { "node": ">=22.12.0 <23" },
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "predev": "npm run build:modules",
+    "dev": "npm run dev --workspace=tablette",
+    "build:modules": "node scripts/modules.mjs build",
+    "prebuild": "npm run build:modules",
+    "build": "npm run build --workspace=tablette",
+    "pretypecheck": "npm run build:modules",
+    "typecheck": "node scripts/modules.mjs typecheck && npm run typecheck --workspace=tablette",
+    "pretest": "npm run build:modules",
+    "test": "node scripts/modules.mjs test && npm run test:proxy --workspace=tablette",
+    "test:smoke": "playwright test",
+    "create:module": "node scripts/create-module.mjs",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "test:scaffold": "node --test tests/scaffold.test.mjs",
+    "check": "npm run check:boundaries && npm run build:modules && npm run test:scaffold && node scripts/modules.mjs typecheck && node scripts/modules.mjs test && npm run typecheck --workspace=tablette && npm run test:proxy --workspace=tablette && npm run build --workspace=tablette"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.1.1",
+    "leaflet": "1.9.4",
+    "tsx": "^4.20.0",
+    "typescript": "^5.7.0",
+    "vite": "^7.3.6"
+  }
+}

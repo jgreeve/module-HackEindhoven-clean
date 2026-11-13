@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Generated GIS app checkout used by `make serve`
+.gis-apps/
+
+# Test output
+test-results/
+playwright-report/
+
+# Documentation build output
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# Synced from @bimr/web (npm run sync:bimr) — never committed
+public/mp/
+public/samples/
+
+# Env / secrets
+.env
+.env.local
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
