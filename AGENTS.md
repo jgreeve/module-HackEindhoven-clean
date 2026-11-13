@@ -4,6 +4,8 @@
 - Read README.md, CONTRIBUTING.md, docs/architecture.md and the target package's README.
 - Check git status before editing; preserve unfamiliar work. Read the linked task and state which package/files you will own.
 - One agent per clone/worktree and branch. Coordinate any shared-file changes.
+- One independent module per agent. No feature development directly on main.
+- Never force-push, rewrite remote history, or modify another agent's workspace.
 
 ## Architecture
 - New user features live in packages/module-<id>, using @tablette/module-sdk.
@@ -11,6 +13,8 @@
 - Do not import app internals or another package's src. Use injected host capabilities or a documented public package contract.
 - ProjectModule.samples in @hackeindhoven/module-contracts adds maps to Samples. No hard-coded per-feature imports in the app shell.
 - Register dependencies through the app package.json; never hand-edit registry.generated.ts.
+- Shared SDK/contracts/host changes require review. Integrate modules through PRs
+  only, after tests pass. Follow docs/MODULE_MIGRATION.md for original-repo work.
 - Keep upstream copyright/license headers and data attribution.
 
 ## Verify

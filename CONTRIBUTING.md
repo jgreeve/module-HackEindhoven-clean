@@ -18,6 +18,14 @@ another developer is running the app. Browser workspaces and keys are per-origin
 
 ## Package ownership
 
+Develop one independent module per agent, on a feature branch; never develop
+features directly on `main`. Never force-push or rewrite remote history.
+Integration requires a PR and passing checks. Do not manually edit generated
+registries. SDK, contracts and host changes require review.
+
+Completed work in the original repository follows
+[the module migration procedure](docs/MODULE_MIGRATION.md).
+
 - Feature work belongs in `packages/module-<id>/`.
 - Keep its tools, API clients, UI/internal tabs, tests and documentation together.
 - Write its owner and scope in its README. A module-task issue records active
